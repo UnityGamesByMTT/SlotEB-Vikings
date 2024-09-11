@@ -57,6 +57,7 @@ public class SocketIOManager : MonoBehaviour
         //Debug.unityLogger.logEnabled = false;
         isLoaded = false;
         SetInit = false;
+
     }
 
     private void Start()
@@ -116,6 +117,7 @@ public class SocketIOManager : MonoBehaviour
 #endif
     }
 
+
     private IEnumerator WaitForAuthToken(SocketOptions options)
     {
         // Wait until myAuth is not null
@@ -129,7 +131,6 @@ public class SocketIOManager : MonoBehaviour
             Debug.Log("My Socket is null");
             yield return null;
         }
-
         Debug.Log("My Auth is not null");
         // Once myAuth is set, configure the authFunction
         Func<SocketManager, Socket, object> authFunction = (manager, socket) =>
@@ -262,14 +263,6 @@ public class SocketIOManager : MonoBehaviour
     internal void CloseSocket()
     {
         SendDataWithNamespace("EXIT");
-        DOVirtual.DelayedCall(0.1f, () =>
-        {
-            if (this.manager != null)
-            {
-                Debug.Log("Dispose my Socket");
-                this.manager.Close();
-            }
-        });
     }
 
     private void ParseResponse(string jsonObject)
@@ -312,6 +305,16 @@ public class SocketIOManager : MonoBehaviour
                     isResultdone = true;
                     break;
                 }
+            case "ExitUser":
+                {
+                    if (this.manager != null)
+                    {
+                        Debug.Log("Dispose my Socket");
+                        this.manager.Close();
+                    }
+                    Application.ExternalCall("window.parent.postMessage", "onExit", "*");
+                    break;
+                }
         }
     }
 
@@ -331,6 +334,7 @@ public class SocketIOManager : MonoBehaviour
         slotManager.SetInitialUI();
 
         isLoaded = true;
+        Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
     }
 
     internal void AccumulateResult(double currBet)
