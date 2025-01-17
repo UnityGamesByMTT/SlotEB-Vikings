@@ -132,11 +132,11 @@ public class SlotBehaviour : MonoBehaviour
     private Coroutine tweenroutine;
     private Tween BalanceTween;
     internal bool IsAutoSpin = false;
-    private bool IsFreeSpin = false;
+    internal bool IsFreeSpin = false;
     private bool IsSpinning = false;
     private bool CheckSpinAudio = false;
     internal bool CheckPopups = false;
-    private int BetCounter = 0;
+    internal int BetCounter = 0;
     private double currentBalance = 0;
     private double currentTotalBet = 0;
     protected int Lines = 20;
@@ -146,7 +146,7 @@ public class SlotBehaviour : MonoBehaviour
     private bool StopSpinToggle;
     private float SpinDelay=0.2f;
     private bool IsTurboOn;
-    private bool WasAutoSpinOn;
+    internal bool WasAutoSpinOn;
 
     private void Start()
     {
