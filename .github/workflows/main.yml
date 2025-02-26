@@ -2,9 +2,9 @@
 name: Unity WebGL Automatic Build 👽✨🚀
 
 on:
-  pull_request:
+  push:
     branches:    
-      - 'dev-build'
+      - 'test'
   workflow_dispatch:
 
 permissions:
@@ -95,4 +95,4 @@ jobs:
           git config advice.addIgnoredFile false
           git status
           git commit -m "Build"
-          git push origin HEAD:dev-build --force
+          git push origin HEAD:test --force
