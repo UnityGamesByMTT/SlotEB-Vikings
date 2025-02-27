@@ -44,7 +44,7 @@ public class SocketIOManager : MonoBehaviour
     private string testToken;
 
     protected string gameID = "SL-VIK";
-     //protected string gameID = "";
+    //protected string gameID = "";
 
     internal bool isLoaded = false;
 
@@ -150,27 +150,33 @@ public class SocketIOManager : MonoBehaviour
         SetupSocketManager(options);
     }
 
-    private void SetupSocketManager(SocketOptions options)
-    {
-        string websocketUri = $"{SocketURI}?transport=websocket";
 
-        // Create and setup SocketManager
+private void SetupSocketManager(SocketOptions options)
+{
+
+    string socketUri;
+
 #if UNITY_EDITOR
-        this.manager = new SocketManager(new Uri(TestSocketURI), options);
+    socketUri = $"{TestSocketURI}?transport=websocket&EIO=4"; // Add query parameters here
 #else
-        this.manager = new SocketManager(new Uri(websocketUri), options);
+    socketUri = $"{SocketURI}?transport=websocket&EIO=4"; // Add query parameters here
 #endif
-        // Set subscriptions
-        this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
-        this.manager.Socket.On<string>("message", OnListenEvent);
-        this.manager.Socket.On<bool>("socketState", OnSocketState);
-        this.manager.Socket.On<string>("internalError", OnSocketError);
-        this.manager.Socket.On<string>("alert", OnSocketAlert);
-        this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
-        // Start connecting to the server
-    }
+
+
+    this.manager = new SocketManager(new Uri(socketUri), options);
+
+
+    this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
+    this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
+    this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
+    this.manager.Socket.On<string>("message", OnListenEvent);
+    this.manager.Socket.On<bool>("socketState", OnSocketState);
+    this.manager.Socket.On<string>("internalError", OnSocketError);
+    this.manager.Socket.On<string>("alert", OnSocketAlert);
+    this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
+
+    // Start connecting to the server
+}
 
     // Connected event handler implementation
     void OnConnected(ConnectResponse resp)
@@ -254,7 +260,7 @@ public class SocketIOManager : MonoBehaviour
             {
                 this.manager.Socket.Emit(eventName);
             }
-        }   
+        }
         else
         {
             Debug.LogWarning("Socket is not connected.");
@@ -275,7 +281,7 @@ public class SocketIOManager : MonoBehaviour
 
         string id = myData.id;
 
-        switch(id)
+        switch (id)
         {
             case "InitData":
                 {
