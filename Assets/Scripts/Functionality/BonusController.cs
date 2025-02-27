@@ -27,6 +27,8 @@ public class BonusController : MonoBehaviour
     private Transform Win_Transform;
     [SerializeField]
     private Transform Loose_Transform;
+    [SerializeField]
+    private SocketIOManager m_SocketManager;
 
     internal bool isCollision = false;
 
@@ -50,9 +52,22 @@ public class BonusController : MonoBehaviour
         if (Win_Transform) Win_Transform.gameObject.SetActive(false);
         if (Loose_Transform) Loose_Transform.gameObject.SetActive(false);
         if (_audioManager) _audioManager.SwitchBGSound(true);
-        if (Spin_Button) Spin_Button.interactable = true;
+        PopulateWheel(m_SocketManager.bonusdata);
         stopIndex = stop;
         if (Bonus_Object) Bonus_Object.SetActive(true);
+        if (Spin_Button) Spin_Button.interactable = true;
+
+        if (slotManager.IsAutoSpin || slotManager.IsFreeSpin)
+        {
+            Spin_Button.gameObject.SetActive(false);
+            DOVirtual.DelayedCall(1f, () => {
+                Spinbutton();
+            });
+        }
+        else
+        {
+            Spin_Button.gameObject.SetActive(true);
+        }
     }
 
     private void Spinbutton()
@@ -60,7 +75,7 @@ public class BonusController : MonoBehaviour
         isCollision = false;
         if (Spin_Button) Spin_Button.interactable = false;
         RotateWheel();
-        DOVirtual.DelayedCall(2f, () =>
+        DOVirtual.DelayedCall(1.5f, () =>
         {
             TurnCollider(stopIndex);
         });
@@ -76,7 +91,10 @@ public class BonusController : MonoBehaviour
             }
             else
             {
-                if (Bonus_Text[i]) Bonus_Text[i].text = bonusdata[i];
+                if (Bonus_Text[i]) Bonus_Text[i].text = (double.Parse(bonusdata[i]) * m_SocketManager.initialData.Bets[slotManager.BetCounter]).ToString();
+                Debug.Log("Bonus Data: " + bonusdata[i]);
+                Debug.Log("Bet Data: " + m_SocketManager.initialData.Bets[slotManager.BetCounter]);
+                Debug.Log("Multiplied Form: " + (double.Parse(bonusdata[i]) * m_SocketManager.initialData.Bets[slotManager.BetCounter]).ToString());
             }
         }
     }

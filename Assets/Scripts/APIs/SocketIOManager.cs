@@ -13,14 +13,9 @@ using Best.SocketIO.Events;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
 using Best.HTTP.Shared;
-using System.Runtime.InteropServices;
 
 public class SocketIOManager : MonoBehaviour
 {
-
-    [DllImport("__Internal")]
-    private static extern void delayHideLoadingScreen();
-
     [SerializeField]
     private SlotBehaviour slotManager;
 
@@ -42,13 +37,14 @@ public class SocketIOManager : MonoBehaviour
     internal JSHandler _jsManager;
 
     protected string SocketURI = null;
-    protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
-    //protected string TestSocketURI = "https://7p68wzhv-5000.inc1.devtunnels.ms/";
+    // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
+    protected string TestSocketURI = "http://localhost:5000/";
 
     [SerializeField]
     private string testToken;
 
     protected string gameID = "SL-VIK";
+    //protected string gameID = "";
 
     internal bool isLoaded = false;
 
@@ -154,26 +150,33 @@ public class SocketIOManager : MonoBehaviour
         SetupSocketManager(options);
     }
 
-    private void SetupSocketManager(SocketOptions options)
-    {
-        string websocketUri = $"{SocketURI}?transport=websocket";
-        // Create and setup SocketManager
+
+private void SetupSocketManager(SocketOptions options)
+{
+
+    string socketUri;
+
 #if UNITY_EDITOR
-        this.manager = new SocketManager(new Uri(TestSocketURI), options);
+    socketUri = $"{TestSocketURI}?transport=websocket&EIO=4"; // Add query parameters here
 #else
-        this.manager = new SocketManager(new Uri(websocketUri), options);
+    socketUri = $"{SocketURI}?transport=websocket&EIO=4"; // Add query parameters here
 #endif
-        // Set subscriptions
-        this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
-        this.manager.Socket.On<string>("message", OnListenEvent);
-        this.manager.Socket.On<bool>("socketState", OnSocketState);
-        this.manager.Socket.On<string>("internalError", OnSocketError);
-        this.manager.Socket.On<string>("alert", OnSocketAlert);
-        this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
-        // Start connecting to the server
-    }
+
+
+    this.manager = new SocketManager(new Uri(socketUri), options);
+
+
+    this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
+    this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
+    this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
+    this.manager.Socket.On<string>("message", OnListenEvent);
+    this.manager.Socket.On<bool>("socketState", OnSocketState);
+    this.manager.Socket.On<string>("internalError", OnSocketError);
+    this.manager.Socket.On<string>("alert", OnSocketAlert);
+    this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
+
+    // Start connecting to the server
+}
 
     // Connected event handler implementation
     void OnConnected(ConnectResponse resp)
@@ -203,7 +206,7 @@ public class SocketIOManager : MonoBehaviour
 
     private void OnListenEvent(string data)
     {
-        Debug.Log("Received some_event with data: " + data);
+        // Debug.Log("Received some_event with data: " + data);
         ParseResponse(data);
     }
 
@@ -257,7 +260,7 @@ public class SocketIOManager : MonoBehaviour
             {
                 this.manager.Socket.Emit(eventName);
             }
-        }   
+        }
         else
         {
             Debug.LogWarning("Socket is not connected.");
@@ -278,7 +281,7 @@ public class SocketIOManager : MonoBehaviour
 
         string id = myData.id;
 
-        switch(id)
+        switch (id)
         {
             case "InitData":
                 {
@@ -303,7 +306,7 @@ public class SocketIOManager : MonoBehaviour
                 }
             case "ResultData":
                 {
-                    Debug.Log(jsonObject);
+                    // Debug.Log(jsonObject);
                     myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.ResultReel);
                     myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
                     resultData = myData.message.GameData;
@@ -340,9 +343,7 @@ public class SocketIOManager : MonoBehaviour
         slotManager.SetInitialUI();
 
         isLoaded = true;
-#if UNITY_WEBGL && !UNITY_EDITOR
-        delayHideLoadingScreen();
-#endif
+        Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
     }
 
     internal void AccumulateResult(double currBet)
