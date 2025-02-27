@@ -151,11 +151,12 @@ public class SocketIOManager : MonoBehaviour
 
     private void SetupSocketManager(SocketOptions options)
     {
+        string websocketUri = $"{SocketURI}?transport=websocket";
         // Create and setup SocketManager
 #if UNITY_EDITOR
         this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-        this.manager = new SocketManager(new Uri(SocketURI), options);
+        this.manager = new SocketManager(new Uri(websocketUri), options);
 #endif
         // Set subscriptions
         this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
