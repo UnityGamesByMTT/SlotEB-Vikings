@@ -152,31 +152,24 @@ public class SocketIOManager : MonoBehaviour
 
 
 private void SetupSocketManager(SocketOptions options)
-{
-
-    string socketUri;
-
+    {
+        // Create and setup SocketManager
 #if UNITY_EDITOR
-    socketUri = $"{TestSocketURI}?transport=websocket&EIO=4"; // Add query parameters here
+        this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-    socketUri = $"{SocketURI}?transport=websocket&EIO=4"; // Add query parameters here
+        this.manager = new SocketManager(new Uri(SocketURI), options);
 #endif
-
-
-    this.manager = new SocketManager(new Uri(socketUri), options);
-
-
-    this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-    this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
-    this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
-    this.manager.Socket.On<string>("message", OnListenEvent);
-    this.manager.Socket.On<bool>("socketState", OnSocketState);
-    this.manager.Socket.On<string>("internalError", OnSocketError);
-    this.manager.Socket.On<string>("alert", OnSocketAlert);
-    this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
-
-    // Start connecting to the server
-}
+        // Set subscriptions
+        this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
+        this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
+        this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
+        this.manager.Socket.On<string>("message", OnListenEvent);
+        this.manager.Socket.On<bool>("socketState", OnSocketState);
+        this.manager.Socket.On<string>("internalError", OnSocketError);
+        this.manager.Socket.On<string>("alert", OnSocketAlert);
+        this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
+        // Start connecting to the server
+    }
 
     // Connected event handler implementation
     void OnConnected(ConnectResponse resp)
