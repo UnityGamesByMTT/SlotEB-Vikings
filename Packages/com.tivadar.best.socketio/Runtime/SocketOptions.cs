@@ -127,7 +127,7 @@ namespace Best.SocketIO
         /// </summary>
         public SocketOptions()
         {
-            ConnectWith = Transports.TransportTypes.Polling;
+            ConnectWith = Transports.TransportTypes.WebSocket;
             Reconnection = true;
             ReconnectionAttempts = int.MaxValue;
             ReconnectionDelay = TimeSpan.FromMilliseconds(1000);

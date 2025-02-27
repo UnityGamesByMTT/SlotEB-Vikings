@@ -12,7 +12,7 @@ using Best.SocketIO;
 using Best.SocketIO.Events;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
-using Best.HTTP.Shared;
+using Best.SocketIO.Transports;
 
 public class SocketIOManager : MonoBehaviour
 {
@@ -88,6 +88,7 @@ public class SocketIOManager : MonoBehaviour
         options.ReconnectionAttempts = maxReconnectionAttempts;
         options.ReconnectionDelay = reconnectionDelay;
         options.Reconnection = true;
+        options.ConnectWith=Best.SocketIO.Transports.TransportTypes.WebSocket;
 
         Application.ExternalCall("window.parent.postMessage", "authToken", "*");
 
