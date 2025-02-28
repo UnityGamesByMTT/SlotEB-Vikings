@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
-using UnityEngine.SceneManagement;
-using UnityEngine.Networking;
-using DG.Tweening;
-using System.Linq;
+
 using Newtonsoft.Json;
 using Best.SocketIO;
 using Best.SocketIO.Events;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
-using Best.SocketIO.Transports;
+using Best.HTTP;
+using Best.HTTP.Shared.PlatformSupport.Text;
+using PlatformSupport.Collections.ObjectModel;
+using System.Text;
+
+using PlatformSupport.Collections.Specialized;
+using Duck.Http;
+using UnityEditor.PackageManager.Requests;
+
 
 public class SocketIOManager : MonoBehaviour
 {
@@ -53,6 +58,8 @@ public class SocketIOManager : MonoBehaviour
     private const int maxReconnectionAttempts = 6;
     private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
 
+    private string AWSALBTG="";
+    private string AWSALBTGCORS="";
     private void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
@@ -70,12 +77,16 @@ public class SocketIOManager : MonoBehaviour
     void ReceiveAuthToken(string jsonData)
     {
         Debug.Log("Received data: " + jsonData);
+        if(jsonData==null || jsonData==""){
+            jsonData="{\"type\":\"authToken\",\"cookie\":\"" + "custom" + "\",\"AWSALBTG\":\"" + "1custom1" + "\",\"AWSALBTGCORS\":\"" + "1AWSALBTGCORS1" + "\",\"socketURL\":\"" + "custom" + "\"}";
 
+        }
         // Parse the JSON data
         var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
         SocketURI = data.socketURL;
         myAuth = data.cookie;
-
+        AWSALBTG=data.AWSALBTG;
+        AWSALBTGCORS=data.AWSALBTGCORS;
         // Proceed with connecting to the server using myAuth and socketURL
     }
 
@@ -84,11 +95,19 @@ public class SocketIOManager : MonoBehaviour
     private void OpenSocket()
     {
         // Create and setup SocketOptions
+
+
         SocketOptions options = new SocketOptions();
         options.ReconnectionAttempts = maxReconnectionAttempts;
         options.ReconnectionDelay = reconnectionDelay;
         options.Reconnection = true;
         options.ConnectWith=Best.SocketIO.Transports.TransportTypes.WebSocket;
+    //     options.AdditionalQueryParams = new ObservableDictionary<string, string>
+    // {
+    //     { "customtoken", "your_token_here" },
+    //     { "userIDDS", "12345" }
+    // };
+        // options.HTTPRequestCustomizationCallback=(this.manager,)=>
 
         Application.ExternalCall("window.parent.postMessage", "authToken", "*");
 
@@ -144,7 +163,11 @@ public class SocketIOManager : MonoBehaviour
             };
         };
         options.Auth = authFunction;
+        options.HTTPRequestCustomizationCallback= (SocketManager req, HTTPRequest context)=>{
+            context.SetHeader("Cookie", $"AWSALBTG={AWSALBTG};, AWSALBTGCORS={AWSALBTGCORS}");
+            context.SetHeader("X-Custom-Header", "your_custom_value");
 
+        };
         Debug.Log("Auth function configured with token: " + myAuth);
 
         // Proceed with connecting to the server
@@ -567,6 +590,10 @@ public class AuthTokenData
 {
     public string cookie;
     public string socketURL;
+
+    public string AWSALBTG;
+
+    public string AWSALBTGCORS;
 }
 
 
