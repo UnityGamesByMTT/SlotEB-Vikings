@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using System;
 
 using Newtonsoft.Json;
@@ -10,13 +9,7 @@ using Best.SocketIO.Events;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization;
 using Best.HTTP;
-using Best.HTTP.Shared.PlatformSupport.Text;
-using PlatformSupport.Collections.ObjectModel;
-using System.Text;
 
-using PlatformSupport.Collections.Specialized;
-using Duck.Http;
-using UnityEditor.PackageManager.Requests;
 
 
 public class SocketIOManager : MonoBehaviour
@@ -58,8 +51,8 @@ public class SocketIOManager : MonoBehaviour
     private const int maxReconnectionAttempts = 6;
     private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
 
-    private string AWSALBTG="";
-    private string AWSALBTGCORS="";
+    private string AWSALBTG="custom";
+    private string AWSALBTGCORS="custom";
     private void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
@@ -83,10 +76,10 @@ public class SocketIOManager : MonoBehaviour
         }
         // Parse the JSON data
         var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
-        SocketURI = data.socketURL;
-        myAuth = data.cookie;
         AWSALBTG=data.AWSALBTG;
         AWSALBTGCORS=data.AWSALBTGCORS;
+        SocketURI = data.socketURL;
+        myAuth = data.cookie;
         // Proceed with connecting to the server using myAuth and socketURL
     }
 
@@ -172,6 +165,8 @@ public class SocketIOManager : MonoBehaviour
 
         // Proceed with connecting to the server
         SetupSocketManager(options);
+
+        yield return null;
     }
 
 
