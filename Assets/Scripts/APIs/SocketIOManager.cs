@@ -43,7 +43,6 @@ public class SocketIOManager : MonoBehaviour
 
     protected string gameID = "SL-VIK";
     //protected string gameID = "";
-
     internal bool isLoaded = false;
 
     internal bool SetInit = false;
@@ -51,8 +50,6 @@ public class SocketIOManager : MonoBehaviour
     private const int maxReconnectionAttempts = 6;
     private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
 
-    private string AWSALBTG="custom";
-    private string AWSALBTGCORS="custom";
     private void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
@@ -70,14 +67,10 @@ public class SocketIOManager : MonoBehaviour
     void ReceiveAuthToken(string jsonData)
     {
         Debug.Log("Received data: " + jsonData);
-        if(jsonData==null || jsonData==""){
-            jsonData="{\"type\":\"authToken\",\"cookie\":\"" + "custom" + "\",\"AWSALBTG\":\"" + "1custom1" + "\",\"AWSALBTGCORS\":\"" + "1AWSALBTGCORS1" + "\",\"socketURL\":\"" + "custom" + "\"}";
-
-        }
         // Parse the JSON data
         var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
-        AWSALBTG=data.AWSALBTG;
-        AWSALBTGCORS=data.AWSALBTGCORS;
+        // AWSALBTG=data.AWSALBTG;
+        // AWSALBTGCORS=data.AWSALBTGCORS;
         SocketURI = data.socketURL;
         myAuth = data.cookie;
         // Proceed with connecting to the server using myAuth and socketURL
@@ -156,11 +149,11 @@ public class SocketIOManager : MonoBehaviour
             };
         };
         options.Auth = authFunction;
-        options.HTTPRequestCustomizationCallback= (SocketManager req, HTTPRequest context)=>{
-            context.SetHeader("Cookie", $"AWSALBTG={AWSALBTG};, AWSALBTGCORS={AWSALBTGCORS}");
-            context.SetHeader("X-Custom-Header", "your_custom_value");
+        // options.HTTPRequestCustomizationCallback= (SocketManager req, HTTPRequest context)=>{
+        //     context.SetHeader("Cookie", $"AWSALBTG={AWSALBTG};, AWSALBTGCORS={AWSALBTGCORS}");
+        //     context.SetHeader("X-Custom-Header", "your_custom_value");
 
-        };
+        // };
         Debug.Log("Auth function configured with token: " + myAuth);
 
         // Proceed with connecting to the server
@@ -586,9 +579,6 @@ public class AuthTokenData
     public string cookie;
     public string socketURL;
 
-    public string AWSALBTG;
-
-    public string AWSALBTGCORS;
 }
 
 
