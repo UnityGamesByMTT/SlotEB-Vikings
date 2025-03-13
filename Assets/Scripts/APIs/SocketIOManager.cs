@@ -110,7 +110,7 @@ public class SocketIOManager : MonoBehaviour
                         socketURL: event.data.socketURL,
                         nameSpace: event.data?.nameSpace ? event.data.nameSpace : ''
                     });
-                    consloe.log(combinedData);
+                    console.log(combinedData);
                     // Send the combined data to Unity
                     SendMessage('SocketManager', 'ReceiveAuthToken', combinedData);
                 }});");
