@@ -110,6 +110,7 @@ public class SocketIOManager : MonoBehaviour
                         socketURL: event.data.socketURL
                         nameSpace: event.data.nameSpace
                     });
+                    consloe.log(combinedData);
                     // Send the combined data to Unity
                     SendMessage('SocketManager', 'ReceiveAuthToken', combinedData);
                 }});");
@@ -176,7 +177,8 @@ private void SetupSocketManager(SocketOptions options)
 #else
         this.manager = new SocketManager(new Uri(SocketURI), options);
 #endif
-        gameSocket=this.manager.GetSocket(nameSpace);
+        Debug.Log(nameSpace);
+        gameSocket=this.manager.GetSocket("/"+nameSpace);
         // Set subscriptions
         gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
         gameSocket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
