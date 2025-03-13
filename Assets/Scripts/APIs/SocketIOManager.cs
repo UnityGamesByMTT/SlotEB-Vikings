@@ -89,7 +89,7 @@ public class SocketIOManager : MonoBehaviour
         options.ReconnectionAttempts = maxReconnectionAttempts;
         options.ReconnectionDelay = reconnectionDelay;
         options.Reconnection = true;
-        options.ConnectWith=Best.SocketIO.Transports.TransportTypes.WebSocket;
+        options.ConnectWith=Best.SocketIO.Transports.TransportTypes.WebSocket;   //for scoket connection
         
     //     options.AdditionalQueryParams = new ObservableDictionary<string, string>
     // {
@@ -173,7 +173,7 @@ private void SetupSocketManager(SocketOptions options)
 #if UNITY_EDITOR
         this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-        gameSocket = new SocketManager(new Uri(SocketURI), options);
+        var gameSocket = new SocketManager(new Uri(SocketURI), options);
         this.manager = gameSocket.GetNamespace(nameSpace);
 #endif
         // Set subscriptions
