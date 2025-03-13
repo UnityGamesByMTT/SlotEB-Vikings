@@ -38,7 +38,7 @@ public class SocketIOManager : MonoBehaviour
     protected string SocketURI = null;
     // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
     protected string TestSocketURI = "http://localhost:5000/";
-    protected string nameSpace="";
+    protected string nameSpace="game";
 
     [SerializeField]
     private string testToken;
@@ -70,7 +70,7 @@ public class SocketIOManager : MonoBehaviour
     {
         Debug.Log("Received data: " + jsonData);
         // Parse the JSON data
-        var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
+        AuthTokenData data = JsonConvert.DeserializeObject<AuthTokenData>(jsonData);
         // AWSALBTG=data.AWSALBTG;
         // AWSALBTGCORS=data.AWSALBTGCORS;
         SocketURI = data.socketURL;
@@ -107,8 +107,8 @@ public class SocketIOManager : MonoBehaviour
                 if (event.data.type === 'authToken') {
                     var combinedData = JSON.stringify({
                         cookie: event.data.cookie,
-                        socketURL: event.data.socketURL
-                        nameSpace: event.data.nameSpace
+                        socketURL: event.data.socketURL,
+                        nameSpace: event.data?.nameSpace ? event.data.nameSpace : ''
                     });
                     consloe.log(combinedData);
                     // Send the combined data to Unity
@@ -178,6 +178,10 @@ private void SetupSocketManager(SocketOptions options)
         this.manager = new SocketManager(new Uri(SocketURI), options);
 #endif
         Debug.Log(nameSpace);
+        if(nameSpace==null || nameSpace=="")
+        {
+            gameSocket=this.manager.Socket;
+        }else
         gameSocket=this.manager.GetSocket("/"+nameSpace);
         // Set subscriptions
         gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
@@ -587,7 +591,7 @@ public class AuthTokenData
     public string cookie;
     public string socketURL;
 
-    public string nameSpace;
+    public string nameSpace="";
 
 }
 
