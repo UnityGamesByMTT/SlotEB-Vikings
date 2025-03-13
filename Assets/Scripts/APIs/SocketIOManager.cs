@@ -37,6 +37,7 @@ public class SocketIOManager : MonoBehaviour
     protected string SocketURI = null;
     // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
     protected string TestSocketURI = "http://localhost:5000/";
+    protected string nameSpace="";
 
     [SerializeField]
     private string testToken;
@@ -73,6 +74,7 @@ public class SocketIOManager : MonoBehaviour
         // AWSALBTGCORS=data.AWSALBTGCORS;
         SocketURI = data.socketURL;
         myAuth = data.cookie;
+        nameSpace=data.nameSpace;
         // Proceed with connecting to the server using myAuth and socketURL
     }
 
@@ -88,6 +90,7 @@ public class SocketIOManager : MonoBehaviour
         options.ReconnectionDelay = reconnectionDelay;
         options.Reconnection = true;
         options.ConnectWith=Best.SocketIO.Transports.TransportTypes.WebSocket;
+        
     //     options.AdditionalQueryParams = new ObservableDictionary<string, string>
     // {
     //     { "customtoken", "your_token_here" },
@@ -104,6 +107,7 @@ public class SocketIOManager : MonoBehaviour
                     var combinedData = JSON.stringify({
                         cookie: event.data.cookie,
                         socketURL: event.data.socketURL
+                        nameSpace: event.data.nameSpace
                     });
                     // Send the combined data to Unity
                     SendMessage('SocketManager', 'ReceiveAuthToken', combinedData);
@@ -169,7 +173,8 @@ private void SetupSocketManager(SocketOptions options)
 #if UNITY_EDITOR
         this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-        this.manager = new SocketManager(new Uri(SocketURI), options);
+        gameSocket = new SocketManager(new Uri(SocketURI), options);
+        this.manager = gameSocket.GetNamespace(nameSpace);
 #endif
         // Set subscriptions
         this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
@@ -578,6 +583,8 @@ public class AuthTokenData
 {
     public string cookie;
     public string socketURL;
+
+    public string nameSpace;
 
 }
 
