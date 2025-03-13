@@ -30,6 +30,7 @@ public class SocketIOManager : MonoBehaviour
     internal bool isResultdone = false;
 
     private SocketManager manager;
+    private Socket gameSocket;
 
     [SerializeField]
     internal JSHandler _jsManager;
@@ -173,18 +174,18 @@ private void SetupSocketManager(SocketOptions options)
 #if UNITY_EDITOR
         this.manager = new SocketManager(new Uri(TestSocketURI), options);
 #else
-        var gameSocket = new SocketManager(new Uri(SocketURI), options);
-        this.manager = gameSocket.GetNamespace(nameSpace);
+        this.manager = new SocketManager(new Uri(SocketURI), options);
 #endif
+        gameSocket=this.manager.GetSocket(nameSpace);
         // Set subscriptions
-        this.manager.Socket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
-        this.manager.Socket.On<string>(SocketIOEventTypes.Error, OnError);
-        this.manager.Socket.On<string>("message", OnListenEvent);
-        this.manager.Socket.On<bool>("socketState", OnSocketState);
-        this.manager.Socket.On<string>("internalError", OnSocketError);
-        this.manager.Socket.On<string>("alert", OnSocketAlert);
-        this.manager.Socket.On<string>("AnotherDevice", OnSocketOtherDevice);
+        gameSocket.On<ConnectResponse>(SocketIOEventTypes.Connect, OnConnected);
+        gameSocket.On<string>(SocketIOEventTypes.Disconnect, OnDisconnected);
+        gameSocket.On<string>(SocketIOEventTypes.Error, OnError);
+        gameSocket.On<string>("message", OnListenEvent);
+        gameSocket.On<bool>("socketState", OnSocketState);
+        gameSocket.On<string>("internalError", OnSocketError);
+        gameSocket.On<string>("alert", OnSocketAlert);
+        gameSocket.On<string>("AnotherDevice", OnSocketOtherDevice);
         // Start connecting to the server
     }
 
@@ -259,16 +260,16 @@ private void SetupSocketManager(SocketOptions options)
     private void SendDataWithNamespace(string eventName, string json = null)
     {
         // Send the message
-        if (this.manager.Socket != null && this.manager.Socket.IsOpen)
+        if (gameSocket != null && gameSocket.IsOpen)
         {
             if (json != null)
             {
-                this.manager.Socket.Emit(eventName, json);
+                gameSocket.Emit(eventName, json);
                 Debug.Log("JSON data sent: " + json);
             }
             else
             {
-                this.manager.Socket.Emit(eventName);
+                gameSocket.Emit(eventName);
             }
         }
         else
