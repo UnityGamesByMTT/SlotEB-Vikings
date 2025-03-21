@@ -426,6 +426,7 @@ public class UIManager : MonoBehaviour
         isExit = true;
         audioController.PlayButtonAudio();
         slotManager.CallCloseSocket();
+        socketManager.closeSocketReactnativeCall(); 
     }
 
     private void OpenMenu()
